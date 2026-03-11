@@ -12,10 +12,10 @@ class Food():
         self.frame_rec = None
         self.texture_timer = 0
         self.texture_switch = 1 / (SQUARE_SIZE / 6)
-        #FOOD MOVE IN PROGRESS
-        # self.move = False
-        # self.move_timer = 0
-        # self.speed = 1 / (SQUARE_SIZE / 20)
+        self.fruit_move_feature = False
+        self.move = False
+        self.move_timer = 0
+        self.speed = 1 / (SQUARE_SIZE / 20)
 
     def startup(self):
         for sprite in SPRITES:
@@ -25,6 +25,9 @@ class Food():
 
     def update(self, snake, counterTail):
         self.texture_timer += get_frame_time()
+
+        if is_key_pressed(KeyboardKey.KEY_M):
+            self.fruit_move_feature = not self.fruit_move_feature
 
         if self.texture_timer >= self.texture_switch:
             self.frame_rec.x = float(self.sprite.width)/SPRITE_FRAMES
@@ -41,19 +44,19 @@ class Food():
                 self.rect.y = get_random_value(0, int(SCREENHEIGHT/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
             
             self.rand_sprite()
-        #FOOD MOVE IN PROGRESS
-        #     self.move = True
 
-        # if self.move:
-        #     self.move_timer += get_frame_time()
-        #     if self.move_timer >= self.speed:
-        #         self.move_timer = 0
-        #         directions = self.get_valid_directions()
-        #         rand_direction = random.choice(directions)
-        #         if self.in_tail(self.rect.x + rand_direction.x * SQUARE_SIZE, self.rect.y + rand_direction.y * SQUARE_SIZE, snake, counterTail):
-        #             rand_direction = random.choice(directions)
-        #         self.rect.x += rand_direction.x * SQUARE_SIZE
-        #         self.rect.y += rand_direction.y * SQUARE_SIZE
+            if self.fruit_move_feature: self.move = True
+
+        if self.fruit_move_feature and self.move:
+            self.move_timer += get_frame_time()
+            if self.move_timer >= self.speed:
+                self.move_timer = 0
+                directions = self.get_valid_directions()
+                rand_direction = random.choice(directions)
+                if self.in_tail(self.rect.x + rand_direction.x * SQUARE_SIZE, self.rect.y + rand_direction.y * SQUARE_SIZE, snake, counterTail):
+                    rand_direction = random.choice(directions)
+                self.rect.x += rand_direction.x * SQUARE_SIZE
+                self.rect.y += rand_direction.y * SQUARE_SIZE
 
     def in_tail(self, x, y, snake, counterTail):
         for i in range(counterTail):
@@ -61,18 +64,18 @@ class Food():
                 return True
         return False
 
-    #FOOD MOVE IN PROGRESS      
-    # def get_valid_directions(self):
-    #     directions = []
-    #     if self.rect.x + SQUARE_SIZE * 2 < SCREENWIDTH - OFFSET.x: #can move right
-    #         directions.append(Vector2(1, 0))
-    #     if self.rect.x - SQUARE_SIZE * 2 > 0: #can move left
-    #         directions.append(Vector2(-1, 0))
-    #     if self.rect.y + SQUARE_SIZE * 2 < SCREENHEIGHT - OFFSET.y: #can move down
-    #         directions.append(Vector2(0, 1))
-    #     if self.rect.y - SQUARE_SIZE * 2 > OFFSET_TOP: #can move up
-    #         directions.append(Vector2(0, -1))
-    #     return directions
+    #used for fruit move
+    def get_valid_directions(self):
+        directions = []
+        if self.rect.x + SQUARE_SIZE * 2 < SCREENWIDTH - OFFSET.x: #can move right
+            directions.append(Vector2(1, 0))
+        if self.rect.x - SQUARE_SIZE * 2 > 0: #can move left
+            directions.append(Vector2(-1, 0))
+        if self.rect.y + SQUARE_SIZE * 2 < SCREENHEIGHT - OFFSET.y: #can move down
+            directions.append(Vector2(0, 1))
+        if self.rect.y - SQUARE_SIZE * 2 > OFFSET_TOP: #can move up
+            directions.append(Vector2(0, -1))
+        return directions
 
     def rand_sprite(self):
         rand_sprite = get_random_value(0, len(self.sprites) - 1)
