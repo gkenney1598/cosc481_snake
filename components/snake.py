@@ -7,7 +7,8 @@ class Snake():
         self.snake_position = [Vector2(0,0)] * SNAKE_LENGTH
         self.allow_move = False
         self.counterTail = 1
-        self.frames_counter = 0
+        self.timer = 0
+        self.move_time = 1 / (SQUARE_SIZE / 4)
     
     def startup(self):
         for i in range(SNAKE_LENGTH):
@@ -32,17 +33,14 @@ class Snake():
         for i in range(self.counterTail):
             self.snake_position[i] = Vector2(self.snake[i].rect.x, self.snake[i].rect.y)
         
-        #this is what allows for the blocky movement of snake
-        if self.frames_counter%5 == 0: 
+        self.timer += get_frame_time()
+        if self.timer >= self.move_time:
+            self.timer = 0
             self.snake[0].update()
             self.allow_move = True
 
             for i in range(1, self.counterTail):
                 self.snake[i].update(self.snake_position[i-1])
-
-        self.frames_counter += 1
-        if self.frames_counter >= 255: #stop from overflow
-            self.frames_counter = 0
 
     def draw(self):
         for i in range(self.counterTail):

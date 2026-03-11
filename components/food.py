@@ -1,5 +1,6 @@
 from pyray import *
 from settings import *
+import random
 
 class Food():
     def __init__(self, ):
@@ -9,7 +10,12 @@ class Food():
         self.sprite = None
         self.sprites = []
         self.frame_rec = None
-        self.frames_counter = 0
+        self.texture_timer = 0
+        self.texture_switch = 1 / (SQUARE_SIZE / 6)
+        #FOOD MOVE IN PROGRESS
+        # self.move = False
+        # self.move_timer = 0
+        # self.speed = 1 / (SQUARE_SIZE / 20)
 
     def startup(self):
         for sprite in SPRITES:
@@ -18,26 +24,56 @@ class Food():
         self.frame_rec = Rectangle(0.0, 0.0, float(self.sprites[0].width)/SPRITE_FRAMES, float(self.sprites[0].height))
 
     def update(self, snake, counterTail):
-        self.frames_counter += 1
+        self.texture_timer += get_frame_time()
 
-        if self.frames_counter == 15:
+        if self.texture_timer >= self.texture_switch:
             self.frame_rec.x = float(self.sprite.width)/SPRITE_FRAMES
-        if self.frames_counter == 30:
+        if self.texture_timer >= self.texture_switch * 2:
             self.frame_rec.x = 0
-            self.frames_counter = 0
+            self.texture_timer = 0
         if not self.active:
             self.active = True
             self.rect.x = get_random_value(0, int(SCREENWIDTH/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.x/2
             self.rect.y = get_random_value(0, int((SCREENHEIGHT-OFFSET_TOP)/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
             
-            #have to do comparison with x and y values, doing vectors doesnt work
-            for i in range(counterTail):
-                if self.rect.x == snake[i].x and self.rect.y == snake[i].y:
-                    self.rect.x = get_random_value(0, int(SCREENWIDTH/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.x/2
-                    self.rect.y = get_random_value(0, int(SCREENHEIGHT/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.y/2
+            while self.in_tail(self.rect.x, self.rect.y, snake, counterTail):
+                self.rect.x = get_random_value(0, int(SCREENWIDTH/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.x/2
+                self.rect.y = get_random_value(0, int(SCREENHEIGHT/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
             
             self.rand_sprite()
-            
+        #FOOD MOVE IN PROGRESS
+        #     self.move = True
+
+        # if self.move:
+        #     self.move_timer += get_frame_time()
+        #     if self.move_timer >= self.speed:
+        #         self.move_timer = 0
+        #         directions = self.get_valid_directions()
+        #         rand_direction = random.choice(directions)
+        #         if self.in_tail(self.rect.x + rand_direction.x * SQUARE_SIZE, self.rect.y + rand_direction.y * SQUARE_SIZE, snake, counterTail):
+        #             rand_direction = random.choice(directions)
+        #         self.rect.x += rand_direction.x * SQUARE_SIZE
+        #         self.rect.y += rand_direction.y * SQUARE_SIZE
+
+    def in_tail(self, x, y, snake, counterTail):
+        for i in range(counterTail):
+            if x == snake[i].x and y == snake[i].y:
+                return True
+        return False
+
+    #FOOD MOVE IN PROGRESS      
+    # def get_valid_directions(self):
+    #     directions = []
+    #     if self.rect.x + SQUARE_SIZE * 2 < SCREENWIDTH - OFFSET.x: #can move right
+    #         directions.append(Vector2(1, 0))
+    #     if self.rect.x - SQUARE_SIZE * 2 > 0: #can move left
+    #         directions.append(Vector2(-1, 0))
+    #     if self.rect.y + SQUARE_SIZE * 2 < SCREENHEIGHT - OFFSET.y: #can move down
+    #         directions.append(Vector2(0, 1))
+    #     if self.rect.y - SQUARE_SIZE * 2 > OFFSET_TOP: #can move up
+    #         directions.append(Vector2(0, -1))
+    #     return directions
+
     def rand_sprite(self):
         rand_sprite = get_random_value(0, len(self.sprites) - 1)
         self.sprite = self.sprites[rand_sprite]

@@ -68,6 +68,7 @@ class Game():
             self.snake.counterTail += 1
             self.score += 10
             self.food.active = False
+            self.food.move = False
             play_sound(self.eatfx)
 
     #Update and draw functions by screen
@@ -111,17 +112,20 @@ class Game():
                 self.eat_fruit()
     
     def draw_game(self):
-        self.snake.draw()
-        self.food.draw()
+        if not self.pause:
+            self.snake.draw()
+            self.food.draw()
 
-        draw_text("Snake", int(SCREENWIDTH/2 - 100), 25, 50, DARKPURPLE)
-        draw_text(str(self.score), int(SCREENWIDTH/3 * 2), 25, 50, DARKPURPLE)
+            draw_text("Snake", int(SCREENWIDTH/2 - 100), 25, 50, DARKPURPLE)
+            draw_text(str(self.score), int(SCREENWIDTH/3 * 2), 25, 50, DARKPURPLE)
 
-        for i in range(SCREENWIDTH//SQUARE_SIZE + 1):
-            draw_line_v(Vector2(i*SQUARE_SIZE + OFFSET.x/2, OFFSET.y/2 + OFFSET_TOP), Vector2(i*SQUARE_SIZE + OFFSET.x/2, SCREENHEIGHT - OFFSET.y/2), BROWN)
+            for i in range(SCREENWIDTH//SQUARE_SIZE + 1):
+                draw_line_v(Vector2(i*SQUARE_SIZE + OFFSET.x/2, OFFSET.y/2 + OFFSET_TOP), Vector2(i*SQUARE_SIZE + OFFSET.x/2, SCREENHEIGHT - OFFSET.y/2), BROWN)
 
-        for i in range((SCREENHEIGHT-OFFSET_TOP)//SQUARE_SIZE + 1):
-            draw_line_v(Vector2(OFFSET.x/2, i*SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP), Vector2(SCREENWIDTH - OFFSET.x/2, i*SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP), BROWN)
+            for i in range((SCREENHEIGHT-OFFSET_TOP)//SQUARE_SIZE + 1):
+                draw_line_v(Vector2(OFFSET.x/2, i*SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP), Vector2(SCREENWIDTH - OFFSET.x/2, i*SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP), BROWN)
+        else:
+            draw_text("Paused", int(SCREENWIDTH/2 - 100), int(SCREENHEIGHT/2 - 60), 60, DARKPURPLE)
     
     def update_gameover(self):
         if is_key_pressed(KeyboardKey.KEY_ENTER) or self.restart_button.is_clicked():
