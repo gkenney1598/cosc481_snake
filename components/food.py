@@ -2,20 +2,29 @@ from pyray import *
 from settings import *
 import random
 
+class FruitType(enumerate):
+    APPLE = 0
+    LEMON = 1
+    ORANGE = 2
+    PEAR = 3
+    STRAWBERRY = 4
+    WATERMELON = 5
+
 class Food():
     def __init__(self, ):
-        self.rect = Rectangle(0, 0, SQUARE_SIZE * SPRITE_SCALE, SQUARE_SIZE * SPRITE_SCALE)
+        self.rect = Rectangle(0, 0, SQUARE_SIZE, SQUARE_SIZE)
         self.color = RED
         self.active = False
-        self.sprite = None
+        self.sprite_texture = None
         self.sprites = []
         self.frame_rec = None
         self.texture_timer = 0
         self.texture_switch = 1 / (SQUARE_SIZE / 6)
-        self.fruit_move_feature = False
         self.move = False
         self.move_timer = 0
         self.speed = 1 / (SQUARE_SIZE / 20)
+        self.cur_sprite = None
+        self.hit_box = Rectangle(0, 0, SQUARE_SIZE, SQUARE_SIZE)
 
     def startup(self):
         for sprite in SPRITES:
@@ -23,14 +32,11 @@ class Food():
 
         self.frame_rec = Rectangle(0.0, 0.0, float(self.sprites[0].width)/SPRITE_FRAMES, float(self.sprites[0].height))
 
-    def update(self, snake, counterTail):
+    def update(self, snake, counterTail, dev_mode):
         self.texture_timer += get_frame_time()
 
-        if is_key_pressed(KeyboardKey.KEY_M):
-            self.fruit_move_feature = not self.fruit_move_feature
-
         if self.texture_timer >= self.texture_switch:
-            self.frame_rec.x = float(self.sprite.width)/SPRITE_FRAMES
+            self.frame_rec.x = float(self.sprite_texture.width)/SPRITE_FRAMES
         if self.texture_timer >= self.texture_switch * 2:
             self.frame_rec.x = 0
             self.texture_timer = 0
@@ -43,26 +49,57 @@ class Food():
                 self.rect.x = get_random_value(0, int(SCREENWIDTH/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.x/2
                 self.rect.y = get_random_value(0, int(SCREENHEIGHT/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
             
-            self.rand_sprite()
+            self.hit_box.x = self.rect.x
+            self.hit_box.y = self.rect.y
+            
+            if not dev_mode:
+                self.rand_sprite()
 
-            if self.fruit_move_feature: self.move = True
+            match self.cur_sprite:
+                case FruitType.LEMON:
+                    self.move = True
+                    self.rect.width = SQUARE_SIZE
+                    self.rect.height = SQUARE_SIZE
+                    self.hit_box.width = self.rect.width
+                    self.hit_box.height = self.rect.height
+                case FruitType.WATERMELON:
+                    self.move = False
+                    self.rect.width = SQUARE_SIZE * 2
+                    self.rect.height = SQUARE_SIZE * 2
+                    self.hit_box.width = self.rect.width
+                    self.hit_box.height = self.rect.height
+                case _:
+                    self.move = False
+                    self.rect.width = SQUARE_SIZE
+                    self.rect.height = SQUARE_SIZE
+                    self.hit_box.width = self.rect.width
+                    self.hit_box.height = self.rect.height
+        
+        if self.active and self.move:
+            self.move_fruit(snake, counterTail)
 
-        if self.fruit_move_feature and self.move:
-            self.move_timer += get_frame_time()
-            if self.move_timer >= self.speed:
-                self.move_timer = 0
-                directions = self.get_valid_directions()
-                rand_direction = random.choice(directions)
-                if self.in_tail(self.rect.x + rand_direction.x * SQUARE_SIZE, self.rect.y + rand_direction.y * SQUARE_SIZE, snake, counterTail):
-                    rand_direction = random.choice(directions)
-                self.rect.x += rand_direction.x * SQUARE_SIZE
-                self.rect.y += rand_direction.y * SQUARE_SIZE
+        if dev_mode:
+            self.set_sprite()
 
     def in_tail(self, x, y, snake, counterTail):
         for i in range(counterTail):
             if x == snake[i].x and y == snake[i].y:
                 return True
         return False
+    
+    def move_fruit(self, snake, counterTail):
+        self.move_timer += get_frame_time()
+        if self.move_timer >= self.speed:
+            self.move_timer = 0
+            directions = self.get_valid_directions()
+            rand_direction = random.choice(directions)
+            if self.in_tail(self.rect.x + rand_direction.x * SQUARE_SIZE, self.rect.y + rand_direction.y * SQUARE_SIZE, snake, counterTail):
+                rand_direction = random.choice(directions)
+            self.rect.x += rand_direction.x * SQUARE_SIZE
+            self.rect.y += rand_direction.y * SQUARE_SIZE
+
+            self.hit_box.x = self.rect.x
+            self.hit_box.y = self.rect.y
 
     #used for fruit move
     def get_valid_directions(self):
@@ -79,12 +116,35 @@ class Food():
 
     def rand_sprite(self):
         rand_sprite = get_random_value(0, len(self.sprites) - 1)
-        self.sprite = self.sprites[rand_sprite]
+        self.cur_sprite = rand_sprite
+        self.sprite_texture = self.sprites[rand_sprite]
 
-    def draw(self):
-        if self.sprite is None: #when restarting game, bug with reloading sprites
+    def set_sprite(self):
+        if is_key_pressed(KeyboardKey.KEY_ONE):
+            self.sprite_texture = self.sprites[FruitType.APPLE]
+            self.cur_sprite = FruitType.APPLE
+        if is_key_pressed(KeyboardKey.KEY_TWO):
+            self.sprite_texture = self.sprites[FruitType.LEMON]
+            self.cur_sprite = FruitType.LEMON
+        if is_key_pressed(KeyboardKey.KEY_THREE):
+            self.sprite_texture = self.sprites[FruitType.ORANGE]
+            self.cur_sprite = FruitType.ORANGE
+        if is_key_pressed(KeyboardKey.KEY_FOUR):
+            self.sprite_texture = self.sprites[FruitType.PEAR]
+            self.cur_sprite = FruitType.PEAR
+        if is_key_pressed(KeyboardKey.KEY_FIVE):
+            self.sprite_texture = self.sprites[FruitType.STRAWBERRY]
+            self.cur_sprite = FruitType.STRAWBERRY
+        if is_key_pressed(KeyboardKey.KEY_SIX):
             self.rand_sprite()
-        draw_texture_pro(self.sprite, self.frame_rec, self.rect, Vector2(0.0, 0.0), 0.0, RAYWHITE)
+
+    def draw(self, dev_mode):
+        if self.sprite_texture is None:
+            self.rand_sprite()
+        draw_texture_pro(self.sprite_texture, self.frame_rec, self.rect, Vector2(0.0, 0.0), 0.0, RAYWHITE)
+
+    def draw_hit_box(self):
+        draw_rectangle_lines_ex(self.hit_box, 2, RED)
 
     def shutdown(self):
         for sprite in self.sprites:

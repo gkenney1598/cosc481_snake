@@ -7,8 +7,11 @@ class Snake():
         self.snake_position = [Vector2(0,0)] * SNAKE_LENGTH
         self.allow_move = False
         self.counterTail = 1
-        self.timer = 0
-        self.move_time = 1 / (SQUARE_SIZE / 4)
+        self.move_timer = 0
+        self.move_time = SNAKE_MOVE_TIME
+        self.head_hitbox = Rectangle(self.snake_position[0].x, self.snake_position[0].y, SQUARE_SIZE, SQUARE_SIZE)
+        self.increase_speed_timer = 0
+        self.increase_speed_time = 10
     
     def startup(self):
         for i in range(SNAKE_LENGTH):
@@ -33,18 +36,29 @@ class Snake():
         for i in range(self.counterTail):
             self.snake_position[i] = Vector2(self.snake[i].rect.x, self.snake[i].rect.y)
         
-        self.timer += get_frame_time()
-        if self.timer >= self.move_time:
-            self.timer = 0
+        self.move_timer += get_frame_time()
+        self.increase_speed_timer += get_frame_time()
+        if self.move_timer >= self.move_time:
+            self.move_timer = 0
             self.snake[0].update()
             self.allow_move = True
 
             for i in range(1, self.counterTail):
                 self.snake[i].update(self.snake_position[i-1])
+            
+            self.head_hitbox.x = self.snake[0].rect.x
+            self.head_hitbox.y = self.snake[0].rect.y
+        
+        if self.increase_speed_timer >= self.increase_speed_time:
+            self.increase_speed_timer = 0
+            self.move_time *= .9
 
     def draw(self):
         for i in range(self.counterTail):
             self.snake[i].draw()
+    
+    def draw_hit_box(self):
+        draw_rectangle_lines_ex(self.head_hitbox, 2, BLUE)
 
     def self_collision(self):
         for i in range(1, self.counterTail):
@@ -60,7 +74,6 @@ class SnakeBlock():
         self.rect = Rectangle(OFFSET.x/2, OFFSET.y/2 + OFFSET_TOP, SQUARE_SIZE, SQUARE_SIZE)
 
     def update(self, new_pos=None):
-        #get_frame_time makes movements not in the boxes, so not included
         if new_pos is not None:
             self.rect.x = new_pos.x
             self.rect.y = new_pos.y
