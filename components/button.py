@@ -7,7 +7,7 @@ class Button():
         self.rect = Rectangle(x, y, width, height)
         self.color = color
         self.text_color = text_color
-        self.font_size = 20
+        self.font_size = SMALL_FONT_SIZE
 
     def draw(self):
         draw_rectangle_rec(self.rect, self.color)

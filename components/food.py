@@ -1,14 +1,7 @@
 from pyray import *
 from settings import *
 import random
-
-class FruitType(enumerate):
-    APPLE = 0
-    LEMON = 1
-    ORANGE = 2
-    PEAR = 3
-    STRAWBERRY = 4
-    WATERMELON = 5
+from enums import FruitType
 
 class Food():
     def __init__(self, ):
@@ -42,38 +35,29 @@ class Food():
             self.texture_timer = 0
         if not self.active:
             self.active = True
-            self.rect.x = get_random_value(0, int(SCREENWIDTH/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.x/2
-            self.rect.y = get_random_value(0, int((SCREENHEIGHT-OFFSET_TOP)/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
+            if self.cur_sprite is FruitType.WATERMELON: #make sure watermelon doesn't spawn half off the map
+                max_x = int(SCREENWIDTH/SQUARE_SIZE - 3)
+                max_y = int((SCREENHEIGHT-OFFSET_TOP)/SQUARE_SIZE - 3)
+            else:
+                max_x = int(SCREENWIDTH/SQUARE_SIZE - 1)
+                max_y = int((SCREENHEIGHT-OFFSET_TOP)/SQUARE_SIZE - 1)
+            self.rect.x = get_random_value(0, max_x) * SQUARE_SIZE + OFFSET.x/2
+            self.rect.y = get_random_value(0, max_y) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
             
-            while self.in_tail(self.rect.x, self.rect.y, snake, counterTail):
-                self.rect.x = get_random_value(0, int(SCREENWIDTH/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.x/2
-                self.rect.y = get_random_value(0, int(SCREENHEIGHT/SQUARE_SIZE - 1)) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
+            for i in range(MAX_PLACEMENT_TRIES):
+                if self.in_tail(self.rect.x, self.rect.y, snake, counterTail):
+                    self.rect.x = get_random_value(0, max_x) * SQUARE_SIZE + OFFSET.x/2
+                    self.rect.y = get_random_value(0, max_y) * SQUARE_SIZE + OFFSET.y/2 + OFFSET_TOP
+                else:
+                    break
             
             self.hit_box.x = self.rect.x
             self.hit_box.y = self.rect.y
             
             if not dev_mode:
                 self.rand_sprite()
-
-            match self.cur_sprite:
-                case FruitType.LEMON:
-                    self.move = True
-                    self.rect.width = SQUARE_SIZE
-                    self.rect.height = SQUARE_SIZE
-                    self.hit_box.width = self.rect.width
-                    self.hit_box.height = self.rect.height
-                case FruitType.WATERMELON:
-                    self.move = False
-                    self.rect.width = SQUARE_SIZE * 2
-                    self.rect.height = SQUARE_SIZE * 2
-                    self.hit_box.width = self.rect.width
-                    self.hit_box.height = self.rect.height
-                case _:
-                    self.move = False
-                    self.rect.width = SQUARE_SIZE
-                    self.rect.height = SQUARE_SIZE
-                    self.hit_box.width = self.rect.width
-                    self.hit_box.height = self.rect.height
+            
+            self.power_up()
         
         if self.active and self.move:
             self.move_fruit(snake, counterTail)
@@ -87,14 +71,38 @@ class Food():
                 return True
         return False
     
+    def power_up(self):
+        match self.cur_sprite:
+            case FruitType.LEMON:
+                self.move = True
+                self.rect.width = SQUARE_SIZE
+                self.rect.height = SQUARE_SIZE
+                self.hit_box.width = self.rect.width
+                self.hit_box.height = self.rect.height
+            case FruitType.WATERMELON:
+                self.move = False
+                self.rect.width = SQUARE_SIZE * 2
+                self.rect.height = SQUARE_SIZE * 2
+                self.hit_box.width = self.rect.width
+                self.hit_box.height = self.rect.height
+            case _:
+                self.move = False
+                self.rect.width = SQUARE_SIZE
+                self.rect.height = SQUARE_SIZE
+                self.hit_box.width = self.rect.width
+                self.hit_box.height = self.rect.height
+    
     def move_fruit(self, snake, counterTail):
         self.move_timer += get_frame_time()
         if self.move_timer >= self.speed:
             self.move_timer = 0
             directions = self.get_valid_directions()
             rand_direction = random.choice(directions)
-            if self.in_tail(self.rect.x + rand_direction.x * SQUARE_SIZE, self.rect.y + rand_direction.y * SQUARE_SIZE, snake, counterTail):
-                rand_direction = random.choice(directions)
+            for i in range(MAX_PLACEMENT_TRIES):
+                if self.in_tail(self.rect.x + rand_direction.x * SQUARE_SIZE, self.rect.y + rand_direction.y * SQUARE_SIZE, snake, counterTail):
+                    rand_direction = random.choice(directions)
+                else:
+                    break
             self.rect.x += rand_direction.x * SQUARE_SIZE
             self.rect.y += rand_direction.y * SQUARE_SIZE
 
@@ -136,6 +144,9 @@ class Food():
             self.sprite_texture = self.sprites[FruitType.STRAWBERRY]
             self.cur_sprite = FruitType.STRAWBERRY
         if is_key_pressed(KeyboardKey.KEY_SIX):
+            self.sprite_texture = self.sprites[FruitType.WATERMELON]
+            self.cur_sprite = FruitType.WATERMELON
+        if is_key_pressed(KeyboardKey.KEY_SEVEN):
             self.rand_sprite()
 
     def draw(self, dev_mode):
