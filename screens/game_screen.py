@@ -34,7 +34,7 @@ class GameScreen():
 
             self.food.update(self.snake.snake_position, self.snake.counterTail, self.dev_mode)
 
-            new_score = self.eat_fruit(score)
+            score = self.eat_fruit(score)
 
         if is_key_pressed(KeyboardKey.KEY_D):
             self.dev_mode = not self.dev_mode
@@ -45,7 +45,7 @@ class GameScreen():
             if is_key_pressed(KeyboardKey.KEY_LEFT_BRACKET):
                 self.snake.move_time *= 1.1
         
-        return Screens.GAME, new_score
+        return Screens.GAME, score
 
     def draw(self, score, high_score):
         if self.dev_mode:
@@ -68,7 +68,7 @@ class GameScreen():
         self.food.draw(self.dev_mode)
 
         if self.pause:
-            draw_text("PAUSED", int(SCREENWIDTH/2 - 100), int(SCREENHEIGHT/2 - 60), LARGE_FONT_SIZE, DARKPURPLE)
+            draw_text("PAUSED", int(SCREENWIDTH/2 - 100), int(SCREENHEIGHT/2 - 60), LARGE_FONT_SIZE, TEXT_COLOR)
 
     def shutdown(self):
         self.food.shutdown()
@@ -92,7 +92,6 @@ class GameScreen():
         return score
 
     def update_score(self, score):
-        print(score)
         match self.score_mode:
             case ScoreMode.NORMAL:
                 score += 10
