@@ -27,6 +27,9 @@ A game heavily inspired by the classic Snake created using Raylib. Play as a sna
 
   <img width="827" height="842" alt="image" src="https://github.com/user-attachments/assets/50629743-c505-4757-82bc-f271402a94d3" />
 
+## Video Demo
+[Gameplay](https://drive.google.com/file/d/15Cg653X7NIY_A2_a2i1WqT1MjuvmXBFX/view?usp=drive_link)
+
 
 
 ## Credits
