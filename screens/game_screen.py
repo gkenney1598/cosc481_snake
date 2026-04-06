@@ -1,8 +1,7 @@
 from pyray import *
-from settings import *
-from components.button import Button
+from settings import * 
 from enums import Screens, ScoreMode, FruitType
-from components.snake import Snake
+from components.Snake import Snake
 from components.food import Food, FruitType
 
 class GameScreen():
@@ -55,9 +54,9 @@ class GameScreen():
             draw_text("DEV MODE", 10, 10, SMALL_FONT_SIZE, RED)
             draw_text("SNAKE SPEED: " + str(round(1/self.snake.move_time * SQUARE_SIZE, 2)), 10, 40, SMALL_FONT_SIZE, RED)
 
-        draw_text("SNAKE", int(SCREENWIDTH/2 - 100), 25, LARGE_FONT_SIZE, DARKPURPLE)
-        draw_text("SCORE: " + str(score), int(SCREENWIDTH - 200), 10, SMALL_FONT_SIZE, DARKPURPLE)
-        draw_text("HIGH SCORE: " + str(high_score), int(SCREENWIDTH - 200), 40, SMALL_FONT_SIZE, DARKPURPLE)
+        draw_text("SNAKE", int(SCREENWIDTH/2 - 100), 25, LARGE_FONT_SIZE, TEXT_COLOR)
+        draw_text("SCORE: " + str(score), int(SCREENWIDTH - 200), 10, SMALL_FONT_SIZE, TEXT_COLOR)
+        draw_text("HIGH SCORE: " + str(high_score), int(SCREENWIDTH - 200), 40, SMALL_FONT_SIZE, TEXT_COLOR)
 
         for i in range(SCREENWIDTH//SQUARE_SIZE + 1):
             draw_line_v(Vector2(i*SQUARE_SIZE + OFFSET.x/2, OFFSET.y/2 + OFFSET_TOP), Vector2(i*SQUARE_SIZE + OFFSET.x/2, SCREENHEIGHT - OFFSET.y/2), BROWN)

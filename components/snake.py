@@ -16,7 +16,8 @@ class Snake():
     def startup(self):
         for i in range(SNAKE_LENGTH):
             self.snake_position[i] = Vector2(0, 0)
-            self.snake.append(SnakeBlock(RED if i == 0 else DARKGREEN))
+            color = BODY_COLOR_LIGHT if i % 2 == 0 else BODY_COLOR_DARK
+            self.snake.append(SnakeBlock(HEAD_COLOR if i == 0 else color))
 
     def update(self):
         if self.allow_move:

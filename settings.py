@@ -1,4 +1,4 @@
-from pyray import Vector2
+from pyray import Vector2, Color
 from pathlib import Path
 
 SCREENWIDTH, SCREENHEIGHT = 850, 850
@@ -18,3 +18,9 @@ LARGE_FONT_SIZE = 60
 MEDIUM_FONT_SIZE = 30
 SMALL_FONT_SIZE = 20
 MAX_PLACEMENT_TRIES = 50
+TEXT_COLOR = Color(35, 142, 181, 255)
+BUTTON_COLOR = Color(68, 145, 111, 255)
+BACKGROUND_COLOR = Color(249, 245, 236, 255)
+HEAD_COLOR = Color(191, 25, 50, 255)
+BODY_COLOR_LIGHT = Color(136, 176, 75, 255)
+BODY_COLOR_DARK = Color(0, 148, 115, 255)

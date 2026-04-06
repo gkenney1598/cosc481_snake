@@ -1,6 +1,6 @@
 from pyray import *
 from game import Game
-from settings import SCREENWIDTH, SCREENHEIGHT
+from settings import SCREENWIDTH, SCREENHEIGHT, BACKGROUND_COLOR
 
 if __name__ == '__main__':
     init_window(SCREENWIDTH, SCREENHEIGHT, "snake")
@@ -14,7 +14,7 @@ if __name__ == '__main__':
         current_game.update()
 
         begin_drawing()
-        clear_background(RAYWHITE)
+        clear_background(BACKGROUND_COLOR)
         current_game.draw()
         end_drawing()
 

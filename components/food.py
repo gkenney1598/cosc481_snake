@@ -152,7 +152,7 @@ class Food():
     def draw(self, dev_mode):
         if self.sprite_texture is None:
             self.rand_sprite()
-        draw_texture_pro(self.sprite_texture, self.frame_rec, self.rect, Vector2(0.0, 0.0), 0.0, RAYWHITE)
+        draw_texture_pro(self.sprite_texture, self.frame_rec, self.rect, Vector2(0.0, 0.0), 0.0, BACKGROUND_COLOR)
 
     def draw_hit_box(self):
         draw_rectangle_lines_ex(self.hit_box, 2, RED)

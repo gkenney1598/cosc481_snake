@@ -1,8 +1,5 @@
 from pyray import *
 from settings import *
-from components.snake import Snake
-from components.food import Food, FruitType
-from components.button import Button
 from enums import Screens
 from screens.startup_screen import StartupScreen
 from screens.instruction_screen import InstructionScreen
@@ -59,7 +56,7 @@ class Game():
             case Screens.STARTUP:
                 self.startup_screen.draw()
             case Screens.INSTRUCTIONS:
-                self.instruction_screen.draw(self.food.sprites, self.food.frame_rec)
+                self.instruction_screen.draw()
             case Screens.GAME:
                 self.game_screen.draw(self.score, self.high_score)
             case Screens.GAMEOVER:
